@@ -1,0 +1,33 @@
+---
+
+name: CI
+'on':
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  test: 
+    name: Molecule-Apache
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - centos8-ansible
+
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+
+      - name: setup python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+    
+      - name: Install test deps
+        run:  pip3 install molecule docker yamllint ansible-lint
+
+      - name: run Molecule test 
+        run: molecule --debug test
