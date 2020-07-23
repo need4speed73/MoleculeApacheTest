@@ -1,0 +1,65 @@
+---
+# tasks file for svcRole
+- name: Latest version of PKGS
+  yum:
+    name:
+      - "{{ firewall_pkg}}"
+      - "{{ web_pkg }}"
+      - "{{ ssl_pkg }}"
+    state: latest
+
+- name: configure web service
+  copy:
+    src: "{{ httpdconf_src }}"
+    dest: "{{ httpdconf_dest }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Make sure Secret dir exists
+  file:
+    path: "{{ secrets_dir }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0500
+
+- name: htpasswd file exsits.
+  copy: 
+    src: "{{ secrets_src }}"
+    dest: "{{ secrets_dest }}"
+    owner: apache
+    group: apache
+    mode: 0400
+
+- name: .htaccess file is setup
+  copy:
+    src: "{{ htaccess_src }}"
+    dest: "{{ web_root }}/.htaccess"
+    owner: apache
+    group: apache
+    mode: 400
+
+- name: create index.html file
+  copy:
+    content: "{{ ansible_facts['fqdn'] }} ({{ ansible_facts['default_ipv4']['address'] }}) has been deployed \n"
+    dest: "{{ web_root }}/index.html"
+
+- name: Firewall service enable
+  service:
+    name: "{{ firewall_svc }}"
+    state: started
+    enabled: true
+
+- name: open http port up
+  firewalld:
+    service: https
+    state: enabled
+    immediate: true
+    permanent: true
+
+- name: Web service enabled and started
+  service:
+    name: "{{ web_svc }}"
+    state: started
+    enabled: true
