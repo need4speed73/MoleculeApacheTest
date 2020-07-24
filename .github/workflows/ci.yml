@@ -1,6 +1,6 @@
 ---
 
-name: CI
+name: Apache-CI
 'on':
   pull_request:
   push:

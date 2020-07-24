@@ -3,6 +3,9 @@ dependency:
   name: galaxy
 driver:
   name: docker
+lint: |
+    yamllint .
+    ansible-lint
 platforms:
   - name: instance
     image: "need4speed73/centos8-ansible:latest"
@@ -16,4 +19,4 @@ provisioner:
   options:
     'vault-id': '/tmp/vault.pw'
 verifier:
-  name: ansible
+  name: testinfra
